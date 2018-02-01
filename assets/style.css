@@ -1,0 +1,29 @@
+body{
+   background-color: blue;
+
+
+}
+
+
+
+.jumbotron{
+   background-color: red;
+
+}
+
+
+
+
+.gifFormat {
+    margin: 10px;
+    padding: 10px;
+}
+
+img {
+    margin: 10px;
+}
+
+#userInput {
+    width: 100%;
+    margin: 0 auto;
+}

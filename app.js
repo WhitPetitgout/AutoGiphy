@@ -1,36 +1,112 @@
-/ this is for background color change
-$(".colorBlock").click(function() {
-   var $backgroundColor = $(this).css("background-color");
-   $("body").css("background-color", $backgroundColor);
- });
+$(document).ready(function(){
+
+  
+    var gifs = ["cars", "trucks", "buses", "airplane"];
+
+ 
+    function displayGifInfo() {
+        var dataGiphy = $(this).attr("data-gif");
+        var random = Math.floor(Math.random() * (100 - 2)) + 2;
+
+        
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+            dataGiphy + "&api_key=dc6zaTOxFJmzC" + "&offset=" + random;
+
+        
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+            }).done(function(response) {
+            var results = response.data;
+            console.log(results);
+
+            for (var i = 0; i < results.length; i++) {
+                
+                var gifImage = $("<img>");
+                
+                gifImage.attr("src", results[i].images.fixed_height.url);
+                
+                gifImage.addClass("control");
+                
+                gifImage.attr("data-still", results[i].images.fixed_height.url);
+                
+                gifImage.attr("data-animate", results[i].images.fixed_height_still.url);
+                
+                gifImage.attr("data-state", "still");
+                
+                $("#gifs-appear-here").prepend(gifImage);
 
 
- var arrayOfElements = ["Dog", "Fish","Cow","Bird","Japan","China","NorthKorea"]
+            }
 
- $(document).ready(buildButtonArray())
- function buildButtonArray () {
-   $(".buttonList").empty()
-   for (i in arrayOfElements) {
-     $(".buttonList").append("<button type='button' onclick='callGiphy( &quot; " + arrayOfElements[i] +" &quot; );'> " + arrayOfElements[i] + " </button>  ")
-   }
- }
- 
- // using proper XML entity representation of &quot;
- 
- function callGiphy(target) {
-   console.log(target)
-   $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + target + "&api_key=Zp7besOucQuLRcQnucf538giZH8iOvlH&limit=20", function(result){
-         //console.log(result.data)
-           $(".result").empty()
-             for (i in result.data) {
-                 $(".result").append("<iframe src=" +  result.data[i].embed_url + "></iframe> <br> <p> Rated " + result.data[i].rating + " <br>");
-             };
-         });
- }
- 
- function addToArray() {
-   var result = $(".newValue").val()
-   console.log(result)
-   arrayOfElements.push(result)
-   buildButtonArray();
- }
+            
+            $(".control").on("click", function() {
+                var state = $(this).attr("data-state");
+    
+                if (state === "still") {
+                    $(this).attr("src", $(this).attr("data-animate"));
+                    $(this).attr("data-state", "animate");
+                
+                } else {
+                    $(this).attr("src", $(this).attr("data-still"));
+                    $(this).attr("data-state", "still");
+                }
+            });
+
+        });
+    };
+
+    
+    function renderButtons() {
+        
+        $("#newGif").empty();
+        
+        $("#userInput").val("");
+
+        
+        for(i = 0; i < gifs.length; i++) {
+            
+            var newButton = $("<button>")
+                
+                .addClass("gifFormat btn btn-primary")
+                
+                .attr("data-gif", gifs[i])
+                
+                .text(gifs[i]);
+            
+            $("#newGif").append(newButton);
+        }
+    };
+
+    
+    $("#add-gif").on("click", function(event) {
+        
+        
+        event.preventDefault();
+
+        
+        var userInput = $("#userInput").val();
+
+        
+        if (userInput.length != 0 && gifs.indexOf(userInput) === -1) {
+          gifs.push(userInput);
+          $("#userInput").val();
+          renderButtons();
+        } else {
+          $("#userInput").val("");
+        }
+    });
+
+    $("#clear-gif").on("click", function(event) {
+
+        
+        event.preventDefault();
+
+        $("#gifs-appear-here").empty();
+
+    })
+
+    $(document).on("click", ".gifFormat", displayGifInfo);
+
+    renderButtons(); 
+})
